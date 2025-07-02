@@ -6,6 +6,7 @@
 services:
   langfuse-worker:
     image: langfuse/langfuse-worker:3
+    networks: [backend]
     restart: always
     depends_on: &langfuse-depends-on
       postgres:
@@ -86,6 +87,7 @@ services:
 
   clickhouse:
     image: clickhouse/clickhouse-server
+    networks: [backend]
     restart: always
     user: "101:101"
     environment:
@@ -107,6 +109,7 @@ services:
 
   minio:
     image: minio/minio
+    networks: [backend]
     restart: always
     entrypoint: sh
     # create the 'langfuse' bucket before starting the service
@@ -115,7 +118,7 @@ services:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: miniosecret # CHANGEME
     ports:
-      - 9090:9000
+      - 9092:9000
       - 127.0.0.1:9091:9001
     volumes:
       - langfuse_minio_data:/data
@@ -128,12 +131,13 @@ services:
 
   redis:
     image: redis:7
+    networks: [backend]
     restart: always
     # CHANGEME: row below to secure redis password
     command: >
       --requirepass ${REDIS_AUTH:-myredissecret}
     ports:
-      - 127.0.0.1:6379:6379
+      - 127.0.0.1:6380:6379
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 3s
@@ -142,6 +146,7 @@ services:
 
   postgres:
     image: postgres:${POSTGRES_VERSION:-latest}
+    networks: [backend]
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
