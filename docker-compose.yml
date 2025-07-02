@@ -65,6 +65,7 @@ services:
 
   langfuse-web:
     image: langfuse/langfuse:3
+    networks: [backend]
     restart: always
     depends_on: *langfuse-depends-on
     ports:
@@ -155,6 +156,10 @@ services:
       - 127.0.0.1:5432:5432
     volumes:
       - langfuse_postgres_data:/var/lib/postgresql/data
+
+networks:
+  backend:
+    external: true
 
 volumes:
   langfuse_postgres_data:
